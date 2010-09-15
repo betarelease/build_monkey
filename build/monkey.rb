@@ -17,7 +17,7 @@ module Build
           DRb.start_service(DRB_URI, Rinda::TupleSpace.new) 
           DRb.thread.join
         rescue Exception => e
-          error "Failed to start Blackboard Server: #{e}"
+          puts "Failed to start Blackboard Server: #{e}"
         end
       end
     end
@@ -41,7 +41,10 @@ module Build
       
         sleep(SLEEP_TIME)
       end
-      trap("INT") { DRb.stop_service }
+      trap("INT") do
+        reap
+        DRb.stop_service
+      end
     end
 
     def spawn_process( count=1, &block )
@@ -49,6 +52,20 @@ module Build
         children << fork( &block )
       end
     end
+    
+    def reap( exit_code=0 )
+      info "Reaping #{children.size} child processes"
+      children.each do |pid|
+        begin
+          Process.kill 9, pid
+        rescue Errno::ESRCH
+          # Ignore.  That pid is already dead.
+        end
+      end
+
+      exit exit_code
+    end
+    
     
   end
 end
