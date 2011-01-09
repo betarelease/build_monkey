@@ -1,11 +1,14 @@
 require "rake"
 
+require "build/process_god"
 require "build/monkey"
 
 task :default do
-  puts "Starting build monkey..."
   Build::Monkey.start
+  puts "Started build server ..."
 
   puts "Building projects like a monkey..."
-  Build::Monkey.new.server  
+  Build::Monkey.new.server
+  Build::Monkey.new.server
+  Build::Monkey.new.server
 end

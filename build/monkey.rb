@@ -1,12 +1,13 @@
 require 'drb/drb'
-require 'rinda/rinda' 
+require 'rinda/rinda'
+require 'rinda/ring'
 require 'rinda/tuplespace'
 
 module Build
   class Monkey
 
     PROJECT_ROOT = "./projects"
-    projects = [ "#{PROJECT_ROOT}/p1", "#{PROJECT_ROOT}/p2", "#{PROJECT_ROOT}/p3" ]
+    PROJECTS = [ "#{PROJECT_ROOT}/p1", "#{PROJECT_ROOT}/p2", "#{PROJECT_ROOT}/p3" ]
     DRB_URI = "druby://localhost:2250"
     SLEEP_TIME = 10
     COMMAND = "build.sh"
@@ -14,14 +15,24 @@ module Build
     
     
     def self.start
-      puts "Starting Server..."
-      fork do
-        begin
-          DRb.start_service( DRB_URI, Rinda::TupleSpace.new ) 
+      begin
+        fork do
+          unless Thread.current[:build_server]
+            puts "Starting Server..."
+            tuplespace = Rinda::TupleSpace.new
+            tuplespace.write([:project, "#{PROJECT_ROOT}/p1"])
+            tuplespace.write([:project, "#{PROJECT_ROOT}/p2"])
+            tuplespace.write([:project, "#{PROJECT_ROOT}/p3"])
+            # ::Rinda::RingServer.new tuplespace
+          
+            DRb.start_service( DRB_URI, tuplespace )
+            Thread.current[:build_server] = self
+          end
+          puts "Server started ..."
           DRb.thread.join
-        rescue Exception => e
-          puts "Failed to start Blackboard Server: #{e}"
         end
+      rescue Exception => e
+        puts "Failed to start Blackboard Server: #{e}"
       end
     end
     
@@ -30,18 +41,24 @@ module Build
 
     def server
       DRb.start_service 
-      
+      puts "In server..."
       tuplespace = Rinda::TupleSpaceProxy.new( DRbObject.new( nil, DRB_URI ) ) 
+      # tuplespace = ::Rinda::RingFinger.primary
+
       
-      loop do 
-        projects.each do |project|
-          ProcessGod.spawn do
-            run_build = `cd #{project}; ./#{COMMAND} > #{RESULT}`
-          end
-        end
+      project = tuplespace.take( [:project, nil] )
       
-        sleep( SLEEP_TIME )
-      end
+      run_build = `cd #{project}; ./#{COMMAND} > #{RESULT}`
+      
+      # loop do 
+      #   PROJECTS.each do |project|
+      #     Build::ProcessGod.spawn do
+      #       run_build = `cd #{project}; ./#{COMMAND} > #{RESULT}`
+      #     end
+      #   end
+      # 
+      #   sleep( SLEEP_TIME )
+      # end
       trap( "INT" ) do
         stop
       end
