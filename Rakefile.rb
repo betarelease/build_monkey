@@ -8,7 +8,7 @@ task :default do
   puts "Started build server ..."
 
   puts "Building projects like a monkey..."
-  Build::Monkey.new.server
-  Build::Monkey.new.server
+  Build::Monkey.new.schedule( "projects" )
+
   Build::Monkey.new.server
 end
