@@ -13,11 +13,11 @@ module Build
     def self.start
       begin
         fork do
-          unless Thread.current[:build_server]
+          unless Thread.current[ :build_server ]
             puts "Starting Server ..."
             tuplespace = Rinda::TupleSpace.new
             DRb.start_service( DRB_URI, tuplespace )
-            Thread.current[:build_server] = self
+            Thread.current[ :build_server ] = self
           end
           puts "Server started ..."
           DRb.thread.join
@@ -31,10 +31,12 @@ module Build
       DRb.start_service 
       tuplespace = Rinda::TupleSpaceProxy.new( DRbObject.new( nil, DRB_URI ) ) 
       
-      projects = Dir.entries( "#{project_root}" ) - [".", ".."]
-      projects.each do |project|
-        tuplespace.write([:project, "#{project_root}/#{project}"])
-      end
+      jobs = sanitize( project_root )
+      jobs.each { |job| tuplespace.write( [:project, "#{project_root}/#{job}"] ) }
+    end
+    
+    def sanitize( project_root )
+      Dir.entries( "#{project_root}" ) - [ ".", ".." ]
     end
     
     def initialize
