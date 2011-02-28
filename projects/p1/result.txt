@@ -1,0 +1,3 @@
+building project 1 ...
+building project 1 ... now building
+building project 1 ... DONE!

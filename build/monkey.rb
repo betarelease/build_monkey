@@ -1,3 +1,4 @@
+require 'singleton'
 require 'drb/drb'
 require 'rinda/rinda'
 require 'rinda/ring'
@@ -5,10 +6,13 @@ require 'rinda/tuplespace'
 
 module Build
   class Monkey
-
+    
+    include Singleton
+    
     DRB_URI = "druby://localhost:2250"
-    COMMAND = "build.sh"
-    RESULT = "result.txt"
+    BUILD_COMMAND = "build.sh"
+    RESULT_FILE = "result.txt"
+    
     
     def self.start
       begin
@@ -27,6 +31,14 @@ module Build
       end
     end
 
+    def log_build(*args)
+      puts args.first.to_s + " (#{Time.now})"
+    end
+    
+    def sanitize( project_root )
+      Dir.entries( "#{project_root}" ) - [ ".", ".." ]
+    end
+    
     def schedule( project_root )
       DRb.start_service 
       tuplespace = Rinda::TupleSpaceProxy.new( DRbObject.new( nil, DRB_URI ) ) 
@@ -35,19 +47,15 @@ module Build
       jobs.each { |job| tuplespace.write( [:project, "#{project_root}/#{job}"] ) }
     end
     
-    def sanitize( project_root )
-      Dir.entries( "#{project_root}" ) - [ ".", ".." ]
-    end
-    
-    def initialize
-    end
-
     def server
       DRb.start_service 
       tuplespace = Rinda::TupleSpaceProxy.new( DRbObject.new( nil, DRB_URI ) ) 
       loop do 
         project = tuplespace.take( [:project, nil] )
-        run_build = `cd #{project.last}; ./#{COMMAND} > #{RESULT}`
+        command = "cd #{project.last}; ./#{BUILD_COMMAND} > #{RESULT_FILE}"
+        log_build( "Running #{command}")
+        run_build = `#{command}`
+        log_build( "Finished #{command}")
       end
       
       trap( "INT" ) do
