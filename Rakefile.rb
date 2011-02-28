@@ -4,13 +4,14 @@ require "build/process_god"
 require "build/monkey"
 
 task :default do
-  Build::Monkey.start
+  build_monkey = Build::Monkey.instance
+  build_monkey.server
   puts "Started build server ..."
   BUILD_COMMAND = "custom_build.sh"
   RESULT_FILE = "custom_result.txt"
 
   puts "Building projects like a monkey..."
-  Build::Monkey.instance.schedule( "projects" )
+  build_monkey.schedule( "projects" )
 
-  Build::Monkey.instance.server
+  build_monkey.run
 end

@@ -14,7 +14,7 @@ module Build
     RESULT_FILE = "result.txt"
     
     
-    def self.start
+    def server
       begin
         fork do
           unless Thread.current[ :build_server ]
@@ -47,7 +47,7 @@ module Build
       jobs.each { |job| tuplespace.write( [:project, "#{project_root}/#{job}"] ) }
     end
     
-    def server
+    def run
       DRb.start_service 
       tuplespace = Rinda::TupleSpaceProxy.new( DRbObject.new( nil, DRB_URI ) ) 
       loop do 
