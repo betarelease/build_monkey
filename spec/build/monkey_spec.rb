@@ -8,4 +8,5 @@ describe Build::Monkey do
     sanitized_jobs = Dir.entries(".").reject { |job| job == "." || job == ".." }
     sanitized_jobs.should == monkey.sanitize( "." )
   end
+  
 end
