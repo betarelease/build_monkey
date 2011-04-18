@@ -3,6 +3,7 @@ require "rake"
 require "build/process_god"
 require "build/monkey"
 
+desc "starts a build monkey server"
 task :default do
   build_monkey = Build::Monkey.instance
   build_monkey.server
@@ -15,3 +16,6 @@ task :default do
 
   build_monkey.run
 end
+
+desc "run all specs"
+task :spec

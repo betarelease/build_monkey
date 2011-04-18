@@ -27,7 +27,8 @@ module Build
       tuplespace = Rinda::TupleSpaceProxy.new( DRbObject.new( nil, DRB_URI ) ) 
       loop do 
         project = tuplespace.take( [:project, nil] )
-        command = "cd #{project.last}; ./#{BUILD_COMMAND} > #{RESULT_FILE}"
+        build_command, result_file = find_job(project.last)
+        command = "cd #{project.last}; ./#{build_command} > #{result_file}"
         log.info "Running #{command}"
         run_build = `#{command}`
         log.info "Finished #{command}"
@@ -38,6 +39,14 @@ module Build
       end
     end
 
+    def find_job(project)
+      files = Dir.entries(project) - [".", ".."]
+      build_command = files.find {|c| c =~ /.sh/}
+      result_file = files.find {|r| r =~ /result/}
+      result_file ||= "result.txt"
+      return build_command, result_file
+    end
+    
     def sanitize( project_root )
       Dir.entries( "#{project_root}" ) - [ ".", ".." ]
     end
