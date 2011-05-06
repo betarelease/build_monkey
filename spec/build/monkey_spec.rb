@@ -12,6 +12,6 @@ describe Build::Monkey do
   it "finds job to run" do
     monkey = Build::Monkey.instance
     found_job = Dir.entries("projects/p1").reject { |job| job == "." || job == ".." }
-    found_job.should == monkey.find_job("projects/p1")
+    found_job.first.should == monkey.find_job("projects/p1").first
   end
 end
