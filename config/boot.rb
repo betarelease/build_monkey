@@ -27,3 +27,7 @@ unless defined? LOGGER
   LOGGER = Logger.new(STDOUT) 
   LOGGER.level = Logger::DEBUG
 end
+
+DRB_URI = "druby://localhost:2250"
+BUILD_COMMAND = "build.sh"
+RESULT_FILE = "result.txt"

@@ -5,13 +5,12 @@ module Build
       @project_root = project_root
     end
     
-    def sanitize
+    def sanitized_jobs
       Dir.entries( "#{@project_root}" ) - [ ".", ".." ]
     end
      
     def publish(tuplespace)
-      jobs = sanitize
-      jobs.each { |job| tuplespace.write( [:project, "#{@project_root}/#{job}"] ) }
+      sanitized_jobs.each { |job| tuplespace.write( [:project, "#{@project_root}/#{job}"] ) }
     end
     
   end

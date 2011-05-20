@@ -3,12 +3,7 @@ module Build
     
     include Singleton
     
-    DRB_URI = "druby://localhost:2250"
-    BUILD_COMMAND = "build.sh"
-    RESULT_FILE = "result.txt"
-    
     def run
-      puts "running "
       DRb.start_service 
       tuplespace = Rinda::TupleSpaceProxy.new( DRbObject.new( nil, DRB_URI ) ) 
       loop do 
