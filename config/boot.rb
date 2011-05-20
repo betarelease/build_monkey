@@ -11,6 +11,19 @@ puts "Bundler loaded unlocked environment: #{ENV["ENVIRONMENT"]}" if $DEBUG
 $LOAD_PATH.unshift( "#{PROJECT_PATH}")
 $LOAD_PATH.unshift("#{PROJECT_PATH}/build")
 
+require 'logger'
+require 'singleton'
+require 'drb/drb'
+require 'rinda/rinda'
+require 'rinda/ring'
+require 'rinda/tuplespace'
+
+
 %w[build].each do |path|
   Dir["#{PROJECT_PATH}/#{path}/**/*.rb"   ].each { |lib| require lib }
+end
+
+unless defined? LOGGER
+  LOGGER = Logger.new(STDOUT) 
+  LOGGER.level = Logger::DEBUG
 end
