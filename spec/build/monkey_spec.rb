@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'build/monkey'
 
 describe Build::Monkey do
 

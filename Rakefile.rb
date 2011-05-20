@@ -1,13 +1,22 @@
 require "rake"
 
-require "./build/process_god"
-require "./build/monkey"
-
 require 'spec/rake/spectask'
-PROJECT_PATH = File.expand_path( File.dirname(__FILE__) )
+
+ENV["ENVIRONMENT"] = "test"
+
+require File.expand_path(
+  File.join(File.dirname(__FILE__), 'config', 'boot') )
+
+desc "default task: runs all specs and prints usage message"
+task :default => [:spec] do
+  puts " Usage of build_monkey...."
+  puts "     rake build "
+  puts "          looks in the projects folder and runs build commands for each project"
+  puts " ------------------------------ Simple and Easy ------------------------------"
+end
 
 desc "starts a build monkey server"
-task :default do
+task :build do
   build_monkey = Build::Monkey.instance
   build_monkey.server
   puts "Started build server ..."
@@ -20,12 +29,11 @@ task :default do
   build_monkey.run
 end
 
-desc "Run all specs in spec directory"
 SPEC_DIR = "#{PROJECT_PATH}/spec"
+
+desc "Run all specs in spec directory"
 Spec::Rake::SpecTask.new do |task|
   task.spec_opts = ['--options', "#{SPEC_DIR}/spec.opts"]
-  task.pattern   = "spec/**/*_spec.rb"
-  
-  # task.spec_files = FileList['spec/**/*_spec.rb']
+  task.pattern   = "spec/**/*_spec.rb"  
 end
 
