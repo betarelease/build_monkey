@@ -11,5 +11,6 @@ puts "Bundler loaded unlocked environment: #{ENV["ENVIRONMENT"]}" if $DEBUG
 $LOAD_PATH.unshift( "#{PROJECT_PATH}")
 $LOAD_PATH.unshift("#{PROJECT_PATH}/build")
 
-require 'monkey'
-require 'process_god'
+%w[build].each do |path|
+  Dir["#{PROJECT_PATH}/#{path}/**/*.rb"   ].each { |lib| require lib }
+end
