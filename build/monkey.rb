@@ -8,7 +8,7 @@ module Build
       tuplespace = Rinda::TupleSpaceProxy.new( DRbObject.new( nil, DRB_URI ) ) 
       loop do 
         project = tuplespace.take( [:project, nil] )
-        job = Job.new(project.last)
+        job = Job.new( project.last )
         job.build
       end
       
@@ -20,8 +20,8 @@ module Build
     def schedule( project_root )
       DRb.start_service 
       tuplespace = Rinda::TupleSpaceProxy.new( DRbObject.new( nil, DRB_URI ) ) 
-      publisher = Publisher.new(project_root)
-      publisher.publish(tuplespace)
+      publisher = Publisher.new( project_root )
+      publisher.publish( tuplespace )
     end
         
     def server

@@ -1,7 +1,7 @@
 module Build
   class Job
     
-    def initialize(project)
+    def initialize( project )
       @project = project
     end
     

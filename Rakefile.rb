@@ -4,8 +4,7 @@ require 'spec/rake/spectask'
 
 ENV["ENVIRONMENT"] = "test"
 
-require File.expand_path(
-  File.join(File.dirname(__FILE__), 'config', 'boot') )
+require File.expand_path( File.join( File.dirname( __FILE__ ), 'config', 'boot' ) )
 
 desc "default task: runs all specs and prints usage message"
 task :default => [:spec] do
