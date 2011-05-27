@@ -16,8 +16,7 @@ module Build
     def find
       files = Dir.entries(@project) - [".", ".."]
       build_command = files.find {|c| c =~ /.sh/}
-      result_file = files.find {|r| r =~ /result/}
-      result_file ||= "result.txt"
+      result_file = "result_#{Time.now.to_i}.txt"
       return build_command, result_file
     end
     
